@@ -1,0 +1,36 @@
+{
+  "name": "capacitybot-cf-nodejs-fct",
+  "version": "0.0.1",
+  "description": "CapacityBot for Google Cloud Functions NodeJS.",
+  "main": "main.js",
+  "scripts": {
+    "install": "gulp",
+    "test": "mocha"
+  },
+  "repository": "https://source.developers.google.com/p/project-id-3506852033363205761/r/capacity-bq",
+  "author": "Michael Menzel, Andre Motta",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint-config-google": "^0.10.0",
+    "gulp": "^4.0.0",
+    "gulp-beautify": "^2.0.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-eslint": "^5.0.0",
+    "gulp-install": "^1.1.0",
+    "gulp-size": "^3.0.0",
+    "gulp-zip": "^4.2.0",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {
+    "@google-cloud/bigquery": "^2.0.1",
+    "@google-cloud/datastore": "^2.0.0",
+    "@google-cloud/logging-winston": "^0.10.0",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.4",
+    "passport": "^0.4.0",
+    "passport-google-oauth": "^1.0.0",
+    "winston": "^3.1.0"
+  }
+}
