@@ -2,14 +2,15 @@
   "name": "capacitybot-cf-nodejs-fct",
   "version": "0.0.1",
   "description": "CapacityBot for Google Cloud Functions NodeJS.",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "install": "gulp",
-    "test": "mocha"
+    "test": "mocha",
+    "build": "gulp"
   },
   "repository": "https://source.developers.google.com/p/project-id-3506852033363205761/r/capacity-bq",
   "author": "Michael Menzel, Andre Motta",
-  "license": "ISC",
+  "license": "Apache 2.0",
   "devDependencies": {
     "chai": "^4.1.2",
     "eslint-config-google": "^0.10.0",

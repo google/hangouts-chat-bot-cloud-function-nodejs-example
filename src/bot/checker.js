@@ -1,5 +1,22 @@
+/*
+ * Copyright 2018 Dr. Michael Menzel, Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /* eslint-disable max-len */
 const logger = require('../logger');
+const params = require('../params');
 const datastore = require('../store/datastore');
 const cache = datastore('cache');
 const users = datastore('users');
@@ -39,10 +56,8 @@ const validateRequest = (req, res, next) => {
   let error = null;
 
   logger.debug(`Checking request with error state ${error}...`);
-
   error = checkResponse(res, error);
   error = checkRequest(req, error);
-
   logger.debug(`Checked request with error state ${error}.`);
 
   if (error && error !== null) {
@@ -57,24 +72,17 @@ const validateRequest = (req, res, next) => {
 
 const detectUser = async (req, res, next) => {
   logger.debug('Detecting user from request...');
-  if (req.body.message &&
-      req.body.message.sender &&
-      req.body.message.sender.email) {
-
+  if (req.body && req.body.message &&
+      req.body.message.sender && req.body.message.sender.email) {
     try {
-      let user = await users.get(users.key([
+      // eslint-disable-next-line array-element-newline
+      const user = (await users.get(users.key([
         'Users',
         req.body.message.sender.email,
-      ]));
+      ])))[ZERO];
 
-      if (user && user.length) {
-        user = user[ZERO];
-        logger.debug(`Found user: ${JSON.stringify(user)}. Logging in...`);
-        req.login(user, {session: false});
-      }
-
-      return next();
-
+      logger.debug(`Found user: ${JSON.stringify(user)}. Logging in...`);
+      if (user && user.length) req.login(user, {session: false});
     } catch (err) {
       logger.error(`ERROR: ${err}`);
 
@@ -82,30 +90,23 @@ const detectUser = async (req, res, next) => {
     }
   } else {
     logger.debug('Missing message with user details in request.');
-
-    return next();
   }
+
+  return next();
 };
 
 const checkUser = async (req, res, next) => {
-  if (!req.user || req.user === null || !req.user.email ||
-      !req.user.refreshToken) {
-
+  if (!req.user || !req.user.email || !req.user.refreshToken) {
     try {
-      logger.debug(`Storing complete URL: ${req.body.configCompleteRedirectUrl}`);
       await cache.save({
-        data: {
-          url: req.body.configCompleteRedirectUrl,
-        },
+        data: {url: req.body.configCompleteRedirectUrl},
         key: cache.key([
           'Cache',
           'completeURL',
         ]),
       });
-      logger.debug('Saved complete URL.');
-      logger.debug('User not logged in. Returning URL for authentication...');
-      res.
-          send(renderer.configureOAuth(req, 'https://europe-west1-sound-datum-210112.cloudfunctions.net/sound-datum-210112-cf-fct/auth/google'));
+      logger.debug('Saved complete URL. Returning URL for authentication...');
+      res.send(renderer.configureOAuth(req, params.oauth.authURL));
 
       return null;
     } catch (err) {
