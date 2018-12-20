@@ -18,8 +18,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const datastore = require('../store/datastore');
-const cache = datastore('cache');
+const base64url = require('base64url');
 
 const logger = require('../logger');
 const params = require('../params');
@@ -28,8 +27,6 @@ const checker = require('../bot/checker');
 const bot = require('../bot/bot');
 
 const app = express();
-
-const ZERO = 0;
 
 app.use(bodyParser());
 app.use(cookieParser('r2d2 is a bot'));
@@ -53,10 +50,10 @@ app.get(
 app.get(
     '/auth/google',
     (req, res, next) => {
-      logger.debug('Initiating authentication.');
+      logger.debug(`Initiating authentication with state ${req.query.state}.`);
       passport.authenticate(
           'google',
-          params.authentication
+          Object.assign(params.authentication, {state: req.query.state})
       )(req, res, next);
     }
 );
@@ -68,18 +65,15 @@ app.get(
           params.authentication
       )(req, res, next);
     },
-    async (req, res) => {
+    (req, res) => {
       try {
         logger.debug('Completed authentication callback.');
-        const completeURL = await cache.get(cache.key([
-          'Cache',
-          'completeURL',
-        ]));
+        const completeURL = base64url.decode(req.query.state);
 
         if (completeURL && completeURL.length) {
           logger.debug(`Found complete URL: ${JSON.stringify(completeURL)}`);
           logger.debug('Redirecting to complete URL...');
-          res.redirect(completeURL[ZERO].url);
+          res.redirect(completeURL);
         }
       } catch (err) {
         logger.error(`ERROR: ${err}`);

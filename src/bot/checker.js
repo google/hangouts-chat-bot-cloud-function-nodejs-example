@@ -15,10 +15,12 @@
  */
 
 /* eslint-disable max-len */
+const base64url = require('base64url');
+const HttpStatus = require('http-status-codes');
+
 const logger = require('../logger');
 const params = require('../params');
 const datastore = require('../store/datastore');
-const cache = datastore('cache');
 const users = datastore('users');
 const renderer = require('./renderer');
 
@@ -30,7 +32,7 @@ const checkResponse = (res, err) => {
   if (!res || !res.status || !res.send) {
     logger.error('Function call without proper response object.');
     error = new Error('Function call without proper response object.');
-    error.status = 500;
+    error.status = HttpStatus.INTERNAL_SERVER_ERROR;
   } else {
     logger.info('Response object present.');
   }
@@ -44,7 +46,7 @@ const checkRequest = (req, err) => {
   if (!req || !req.body) {
     logger.warn('Function call without proper request object.');
     error = new Error('No valid request.');
-    error.status = 400;
+    error.status = HttpStatus.BAD_REQUEST;
   } else {
     logger.info(`Request body ${JSON.stringify(req.body)}.`);
   }
@@ -60,7 +62,7 @@ const validateRequest = (req, res, next) => {
   error = checkRequest(req, error);
   logger.debug(`Checked request with error state ${error}.`);
 
-  if (error && error !== null) {
+  if (error) {
     logger.warn(`Forwarding error state ${error}.`);
 
     return next(error);
@@ -95,18 +97,12 @@ const detectUser = async (req, res, next) => {
   return next();
 };
 
-const checkUser = async (req, res, next) => {
+const checkUser = (req, res, next) => {
   if (!req.user || !req.user.email || !req.user.refreshToken) {
+    if (!req.body.configCompleteRedirectUrl) return next(new Error('No configuration completion URL provided.'));
     try {
-      await cache.save({
-        data: {url: req.body.configCompleteRedirectUrl},
-        key: cache.key([
-          'Cache',
-          'completeURL',
-        ]),
-      });
       logger.debug('Saved complete URL. Returning URL for authentication...');
-      res.send(renderer.configureOAuth(req, params.oauth.authURL));
+      res.send(renderer.configureOAuth(req, `${params.oauth.authURL}?state=${base64url(req.body.configCompleteRedirectUrl)}`));
 
       return null;
     } catch (err) {
@@ -123,9 +119,9 @@ const checkUser = async (req, res, next) => {
 
 // eslint-disable-next-line max-params
 const errorMessage = (err, req, res, next) => {
-  if (err && err.status && err.message) {
+  if (err && err.message) {
     logger.warn(`Something went wrong! error: ${JSON.stringify(err)}`);
-    res.status(err.status).send(err.message);
+    res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).send(err.message);
   }
 };
 
