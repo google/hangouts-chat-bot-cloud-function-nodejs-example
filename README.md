@@ -11,24 +11,25 @@ The following sections describe how to deploy the bot on Google Cloud Functions 
 Following a list of steps which prepare your GCP project and configure the code example:
 
 First, you need to enable the following APIs in your GCP project:
-- Google+
-- Hangouts Chat
-- Cloud Datastore
-- Cloud Functions
-- Cloud Build
+- [Google+](https://console.cloud.google.com/flows/enableapi?apiid=plus.googleapis.com) 
+- [Hangouts Chat](https://console.cloud.google.com/flows/enableapi?apiid=chat.googleapis.com) 
+- [Cloud Datastore](https://console.cloud.google.com/datastore)
+- [Cloud Functions](https://console.cloud.google.com/functions)
+- [Cloud Build](https://console.cloud.google.com/cloud-build)
 
 Then, following steps are required:
-- Install Google Cloud SDK or use Google Cloud Shell
-- Create Google Cloud Storage bucket for the function code
-- Create Google Cloud Datastore in project
-- Grant Google Cloud Build permissions to administer Cloud Functions
-- Grant Cloud Function service account access to Cloud Datastore
+- [Install Google Cloud SDK](https://cloud.google.com/sdk/docs/quickstarts) or [Use Google Cloud Shell](https://cloud.google.com/shell/docs/quickstart)
+- [Create Google Cloud Storage bucket](https://cloud.google.com/storage/docs/creating-buckets) for the function code
+- [Create Google Cloud Datastore in you GCP project](https://console.cloud.google.com/datastore)
+- [Grant Google Cloud Build permissions to administer Cloud Functions](https://cloud.google.com/iam/docs/granting-roles-to-service-accounts#granting_access_to_a_service_account_for_a_resource)
+- [Grant Cloud Function service account access to Cloud Datastore](https://cloud.google.com/iam/docs/granting-roles-to-service-accounts#granting_access_to_a_service_account_for_a_resource)
 
-Next, copy  ```src/param.js.template``` to ```src/params.js```. 
+To enable Google Cloud Build to deploy to Cloud Functions, you need to grant developer permissions and enable the use of service accounts.
+Add the permissions _Service Account > Use Service Account_ and _Cloud Functions > Developer_ to the Cloud Build service account.
+
+Finally, copy  ```src/param.js.template``` to ```src/params.js```. 
 In the new file, copy your OAuth client credentials and add scopes (optional).
 
-To enable Google Cloud Build to deploy to Cloud Functions, you need to enable the use of service accounts.
-Add the permission ```iam.useServiceAccount``` to the Cloud Build service account.
 
 ## Deployment
 
