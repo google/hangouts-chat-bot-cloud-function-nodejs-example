@@ -1,5 +1,7 @@
 # Hangouts Chat Bot on Google Cloud Functions
 
+*This is not an officially supported Google product*
+
 This repo contains a full example of a Google Cloud Function which can server as a bot for Google Hangouts Chat written in NodeJS.
 The bot is able to authenticate users with their Google account by means of a OAuth 2.0 web flow and acquire permissions for scopes from the Google Cloud Platform (GCP).
 In this particular example, the bot asks to access Google BigQuery on behalf of the user.
@@ -46,10 +48,22 @@ gcloud builds submit --substitutions=_BUCKET=[code-bucket]
 You can use the following command to trigger the authentication flow from the shell:
 
 ```bash
-curl -vvv -X POST -H "Content-Type: application/json" -d '{"configCompleteRedirectUrl": "https://google.com"}' https://[region]-[gcp-prject-id].cloudfunctions.net/[function-name]/bot
+curl -vvv -X POST -H "Content-Type: application/json" -d '{"configCompleteRedirectUrl": "https://google.com"}' https://[region]-[gcp-project-id].cloudfunctions.net/[function-name]/bot
 ```
 
 To follow the OAuth flow, pick the URL included in the response and open it in a browser (e.g. Chrome).
+
+[Read more about concepts of a Hangouts Chat bot.](https://developers.google.com/hangouts/chat/how-tos/bots-develop)
+
+## Publish your Hangouts Chat Bot
+
+The procedure to publish the chat bot is as described in the [documentation](https://developers.google.com/hangouts/chat/how-tos/bots-publish). 
+When entering the URL of your bot, use the following pattern to construct your bot URL:
+
+```URL
+https://[region]-[gcp-prject-id].cloudfunctions.net/[function-name]/bot
+``` 
+
 
 ## Contributers
 
