@@ -23,7 +23,6 @@ const {BigQuery} = require('@google-cloud/bigquery');
 const ZERO = 0;
 
 const conversation = (req, res, next) => {
-
   try {
     logger.debug('Querying BigQuery...');
     const bigquery = new BigQuery({
@@ -51,7 +50,6 @@ const conversation = (req, res, next) => {
     logger.warn(`Could not query from BigQuery: ${JSON.stringify(error)}`);
     res.send(renderer.helloWorld(req, ZERO));
   }
-
 };
 
 
